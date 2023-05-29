@@ -56,3 +56,23 @@ for msg in consumer:
 
     except:
         print("Could not insert into MongoDB")
+
+    
+    #Create memmes_summary and insert groups into MongoDB
+    try:
+        agg_result= db.photos_info.aggregate(
+            [{
+                "$group" :
+                { "_id" : "$name",
+                    "n" : {"$sum":1}
+                }}
+            ])
+        db.photos_summary.delete_many({})
+        for i in agg_result:
+            print(i)
+            summary_id = db.photos_summary.insert_one(i)
+            print("Summary inserted with record ids", summary_id)
+    
+    except Exception as e:
+        print(f'group by caught {type(e)}: ')
+        print (e)
